@@ -108,11 +108,12 @@ static inline bool ts_node__is_relevant(TSNode self, bool include_anonymous) {
   if (include_anonymous) {
     return ts_subtree_visible(tree) || ts_node__alias(&self);
   } else {
-    return
-      (ts_subtree_visible(tree) &&
-       ts_subtree_named(tree)) ||
-      (ts_node__alias(&self) &&
-       ts_language_symbol_metadata(self.tree->language, ts_node__alias(&self)).named);
+    TSSymbol alias = ts_node__alias(&self);
+    if (alias) {
+      return ts_language_symbol_metadata(self.tree->language, alias).named;
+    } else {
+      return ts_subtree_visible(tree) && ts_subtree_named(tree);
+    }
   }
 }
 
@@ -149,7 +150,9 @@ static inline TSNode ts_node__child(
     while (ts_node_child_iterator_next(&iterator, &child)) {
       if (ts_node__is_relevant(child, include_anonymous)) {
         if (index == child_index) {
-          ts_tree_set_cached_parent(self.tree, &child, &self);
+          if (ts_node__is_relevant(self, true)) {
+            ts_tree_set_cached_parent(self.tree, &child, &self);
+          }
           return child;
         }
         index++;
@@ -414,13 +417,15 @@ TSPoint ts_node_end_point(TSNode self) {
 }
 
 TSSymbol ts_node_symbol(TSNode self) {
-  return ts_node__alias(&self)
-    ? ts_node__alias(&self)
-    : ts_subtree_symbol(ts_node__subtree(self));
+  TSSymbol symbol = ts_node__alias(&self);
+  if (!symbol) symbol = ts_subtree_symbol(ts_node__subtree(self));
+  return ts_language_public_symbol(self.tree->language, symbol);
 }
 
 const char *ts_node_type(TSNode self) {
-  return ts_language_symbol_name(self.tree->language, ts_node_symbol(self));
+  TSSymbol symbol = ts_node__alias(&self);
+  if (!symbol) symbol = ts_subtree_symbol(ts_node__subtree(self));
+  return ts_language_symbol_name(self.tree->language, symbol);
 }
 
 char *ts_node_string(TSNode self) {
@@ -440,8 +445,9 @@ bool ts_node_is_extra(TSNode self) {
 }
 
 bool ts_node_is_named(TSNode self) {
-  return ts_node__alias(&self)
-    ? ts_language_symbol_metadata(self.tree->language, ts_node__alias(&self)).named
+  TSSymbol alias = ts_node__alias(&self);
+  return alias
+    ? ts_language_symbol_metadata(self.tree->language, alias).named
     : ts_subtree_named(ts_node__subtree(self));
 }
 

@@ -7,17 +7,40 @@ else
   : ${CC:=gcc}
 fi
 
-${CC}                   \
-  -c                    \
-  -O3                   \
-  -std=c99              \
-  $CFLAGS               \
-  -I lib/src            \
-  -I lib/include        \
-  -I lib/utf8proc       \
-  lib/src/lib.c     \
-  syntaxes/json_parser.c \
-  syntaxes/c_parser.c \
+${CC}                                    \
+  -c                                     \
+  -O3                                    \
+  $CFLAGS                                \
+  -I lib/src                             \
+  -I lib/include                         \
+  lib/src/lib.c                          \
+  syntaxes/json_parser.c                 \
+  syntaxes/c_parser.c                    \
+  syntaxes/cpp_parser.c                  \
+  syntaxes/scanners/cpp_scanner.cc       \
+  syntaxes/python_parser.c               \
+  syntaxes/scanners/python_scanner.cc    \
+  syntaxes/javascript_parser.c           \
+  syntaxes/scanners/javascript_scanner.c \
+  syntaxes/typescript_parser.c           \
+  syntaxes/scanners/typescript_scanner.c \
+  syntaxes/scanners/ts_scanner.h         \
+  syntaxes/tsx_parser.c                  \
+  syntaxes/scanners/tsx_scanner.c        \
 
-ar rcs libtree-sitter.a lib.o json_parser.o c_parser.o
+ar rcs libtree-sitter.a  \
+    lib.o                \
+    json_parser.o        \
+    c_parser.o           \
+    cpp_parser.o         \
+    cpp_scanner.o        \
+    python_parser.o      \
+    python_scanner.o     \
+    javascript_parser.o  \
+    javascript_scanner.o \
+    typescript_parser.o  \
+    typescript_scanner.o \
+    tsx_parser.o         \
+    tsx_scanner.o        \
+
 rm *.o

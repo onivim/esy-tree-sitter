@@ -1,13 +1,13 @@
 {
   "name": "esy-tree-sitter",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "esy-enabled build for tree-sitter",
   "license": "MIT",
   "esy": {
     "build": [
         ["bash", "-c", "echo", "#{os}"],
         ["bash", "-c", "#{os == 'windows' ? 'CC=x86_64-w64-mingw32-gcc script/build-lib' : 'echo'}"],
-        ["bash", "-c", "#{os == 'linux' ? 'CFLAGS=-fPIC script/build-lib' : 'echo'}"],
+        ["bash", "-c", "#{os == 'linux' ? 'CC=gcc CFLAGS=-fPIC script/build-lib' : 'echo'}"],
         ["bash", "-c", "#{os == 'darwin' ? 'CC=gcc script/build-lib' : 'echo'}"],
         ["bash", "-c", "#{os == 'macOS' ? 'CC=gcc script/build-lib' : 'echo'}"]
     ],
